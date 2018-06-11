@@ -55,14 +55,27 @@ function wrapComponentInWithRouter(j, root) {
 
 
   const withRouterCall = (code) => j.callExpression(j.identifier('withRouter'), [code])
-  thisPropsRouter.closest(j.ClassExpression).filter((path) => {
-    return j(path).closest(j.CallExpression, {callee: {name: 'withRouter'}}).length === 0
+  thisPropsRouter.closest(j.ClassExpression).filter((path) => { 
+    // If it's already wrapped we shouldn't wrap it again
+    if(j(path).closest(j.CallExpression, {callee: {name: 'withRouter'}}).length > 0) {
+      return false
+    }
+
+    return true
   }).replaceWith((path) => {
     return withRouterCall(path.node)
   })
 
   thisPropsRouter.closest(j.ClassDeclaration).filter((path) => {
-    return j(path).closest(j.CallExpression, {callee: {name: 'withRouter'}}).length === 0
+    // If it's not a default export we can't just wrap the class
+    if(j(path).closest(j.ExportDefaultDeclaration).length === 0) {
+      return false
+    }
+    // If it's already wrapped we shouldn't wrap it again
+    if(j(path).closest(j.CallExpression, {callee: {name: 'withRouter'}}).length > 0) {
+      return false
+    }
+    return true
   }).replaceWith((path) => {
     path.node.type = 'ClassExpression' // ClassDeclaration has to be transformed into ClassExpression for it to be nested inside a function
 
