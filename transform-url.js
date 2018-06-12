@@ -115,6 +115,38 @@ export default function transformer(file, api) {
       return
     }
 
+    if(declaration.type === 'CallExpression') {
+      j(rule).find(j.CallExpression, (haystack) => {
+        if(haystack.arguments.length !== 1) {
+          return false
+        }
+
+        const firstArgument = haystack.arguments[0] || {}
+        if(firstArgument.type === 'Identifier') {
+          return true
+        }
+        
+        return false
+      }).forEach((callRule) => {
+        const {name} = callRule.value.arguments[0] 
+
+        // find the implementation of the variable, can be a class, function, etc
+        const implementation = root.find(j.Declaration, {id: {name}}) 
+        // Find usage of `this.props.url`
+        const thisPropsUrlUsage = getThisPropsUrlNodes(j, implementation)
+
+        if(thisPropsUrlUsage.length === 0) {
+          return
+        }
+
+        // rename `url` to `router`
+        turnUrlIntoRouter(j, thisPropsUrlUsage)
+        wrapDefaultExportInWithRouter()
+        addWithRouterImport(j, root)
+        return
+      })
+    }
+
     const thisPropsUrlUsage = getThisPropsUrlNodes(j, j(rule))
 
     if(thisPropsUrlUsage.length === 0) {
