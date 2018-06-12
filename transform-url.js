@@ -49,6 +49,21 @@ function getThisPropsUrlNodes(j, tree) {
   })
 }
 
+// Wraps the provided node in a function call
+// For example if `functionName` is `withRouter` it will wrap the provided node in `withRouter(NODE_CONTENT)`
+function wrapNodeInFunction(j, functionName, args) {
+  const mappedArgs = args.map(node => {
+    // If the node is a ClassDeclaration we have to turn it into a ClassExpression
+    // since ClassDeclarations can't be wrapped in a function
+    if(node.type === 'ClassDeclaration') {
+      node.type = 'ClassExpression'
+    }
+
+    return node
+  })
+  return j.callExpression(j.identifier(functionName), mappedArgs)
+}
+
 function turnUrlIntoRouter(j, tree) {
   tree.find(j.Identifier, {name: "url"}).replaceWith(j.identifier('router'))
 }
@@ -69,22 +84,12 @@ export default function transformer(file, api) {
     const {value: node} = rule
     // declaration holds the AST node for what comes after `export default`
     const {declaration} = node
-    
-    // Wraps the provided node in a `withRouter` call
-    function createWithRouterCall(node) {
-      // If the node is a ClassDeclaration we have to turn it into a ClassExpression
-      // since ClassDeclarations can't be wrapped in a function
-      if(node.type === 'ClassDeclaration') {
-        node.type = 'ClassExpression'
-      }
-      return j.callExpression(j.identifier('withRouter'), [node])
-    }
 
     function wrapDefaultExportInWithRouter() {
       if(j(rule).find(j.CallExpression, {callee: {name: 'withRouter'}}).length > 0) {
         return
       }
-      j(rule).replaceWith(j.exportDefaultDeclaration(createWithRouterCall(declaration)))
+      j(rule).replaceWith(j.exportDefaultDeclaration(wrapNodeInFunction(j, 'withRouter', [declaration])))
     }
 
     // The `Identifier` type is given in this case:
