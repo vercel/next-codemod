@@ -49,6 +49,13 @@ function getThisPropsUrlNodes(j, tree) {
   })
 }
 
+function getPropsUrlNodes(j, tree, name) {
+  return tree.find(j.MemberExpression, {
+    object: {name},
+    property: {name: "url"}
+  })
+}
+
 // Wraps the provided node in a function call
 // For example if `functionName` is `withRouter` it will wrap the provided node in `withRouter(NODE_CONTENT)`
 function wrapNodeInFunction(j, functionName, args) {
@@ -100,7 +107,10 @@ export default function transformer(file, api) {
       const {name} = declaration 
 
       // find the implementation of the variable, can be a class, function, etc
-      const implementation = root.find(j.Declaration, {id: {name}}) 
+      let implementation = root.find(j.Declaration, {id: {name}}) 
+      if(implementation.length === 0) {
+        implementation = root.find(j.VariableDeclarator, {id: {name}})
+      }
       // Find usage of `this.props.url`
       const thisPropsUrlUsage = getThisPropsUrlNodes(j, implementation)
 
@@ -112,6 +122,23 @@ export default function transformer(file, api) {
       turnUrlIntoRouter(j, thisPropsUrlUsage)
       wrapDefaultExportInWithRouter()
       addWithRouterImport(j, root)
+      return
+    }
+
+    const arrowFunctions = j(rule).find(j.ArrowFunctionExpression)
+
+    if(arrowFunctions.length > 0) {
+      arrowFunctions.forEach(r => {
+        const name = r.value.params[0].name
+        const propsUrlUsage = getPropsUrlNodes(j, j(r), name)  
+        if(propsUrlUsage.length === 0) {
+          return
+        }
+
+        turnUrlIntoRouter(j, propsUrlUsage)
+        wrapDefaultExportInWithRouter()
+        addWithRouterImport(j, root)
+      })
       return
     }
 
@@ -131,7 +158,10 @@ export default function transformer(file, api) {
         const {name} = callRule.value.arguments[0] 
 
         // find the implementation of the variable, can be a class, function, etc
-        const implementation = root.find(j.Declaration, {id: {name}}) 
+        let implementation = root.find(j.Declaration, {id: {name}})
+        if(implementation.length === 0) {
+          implementation = root.find(j.VariableDeclarator, {id: {name}})
+        }
         // Find usage of `this.props.url`
         const thisPropsUrlUsage = getThisPropsUrlNodes(j, implementation)
 

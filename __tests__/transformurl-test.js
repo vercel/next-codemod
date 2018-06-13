@@ -9,3 +9,5 @@ defineTest(__dirname, 'transform-url', null, 'export-default-variable');
 defineTest(__dirname, 'transform-url', null, 'export-default-variable-wrapping');
 defineTest(__dirname, 'transform-url', null, 'no-transform');
 defineTest(__dirname, 'transform-url', null, 'wrapping-export');
+defineTest(__dirname, 'transform-url', null, 'variable-export');
+defineTest(__dirname, 'transform-url', null, 'arrow-function-component');
