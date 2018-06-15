@@ -104,13 +104,50 @@ export default function transformer(file, api) {
     // where `Test` is the identifier
     if(declaration.type === 'Identifier') {
       // the variable name
-      const {name} = declaration 
+      const {name} = declaration
 
       // find the implementation of the variable, can be a class, function, etc
       let implementation = root.find(j.Declaration, {id: {name}}) 
       if(implementation.length === 0) {
         implementation = root.find(j.VariableDeclarator, {id: {name}})
       }
+
+      implementation.find(j.Property, {key: {name: 'url'}}).forEach((propertyRule) => {
+        const isThisPropsDestructure = j(propertyRule).closest(j.VariableDeclarator, {
+          init: {
+            object: {
+              type: 'ThisExpression'
+            },
+            property: {name: 'props'}
+          }
+         }
+        )
+        if(isThisPropsDestructure.length === 0) {
+          return
+        }
+        const originalKeyValue = propertyRule.value.value.name
+        propertyRule.value.key.name = 'router'
+        wrapDefaultExportInWithRouter()
+        addWithRouterImport(j, root)
+        // If the property is reassigned to another variable we don't have to transform it
+        if(originalKeyValue !== 'url') {
+          return
+        }
+        
+        propertyRule.value.value.name = 'router'
+        j(propertyRule).closest(j.BlockStatement).find(j.Identifier, (node) => {
+          if(node.type === 'JSXIdentifier') {
+            return false
+          }
+          
+          if(node.name !== 'url') {
+            return false
+          }
+          
+          return true
+        }).replaceWith(j.identifier('router'))
+      })
+
       // Find usage of `this.props.url`
       const thisPropsUrlUsage = getThisPropsUrlNodes(j, implementation)
 
@@ -126,9 +163,14 @@ export default function transformer(file, api) {
     }
 
     const arrowFunctions = j(rule).find(j.ArrowFunctionExpression)
-
+	
+    ;(() => {
     if(arrowFunctions.length > 0) {
       arrowFunctions.forEach(r => {
+        if(!r.value.params || !r.value.params[0]) {
+          return
+        }
+
         const name = r.value.params[0].name
         const propsUrlUsage = getPropsUrlNodes(j, j(r), name)  
         if(propsUrlUsage.length === 0) {
@@ -141,13 +183,10 @@ export default function transformer(file, api) {
       })
       return
     }
+    })()
 
     if(declaration.type === 'CallExpression') {
       j(rule).find(j.CallExpression, (haystack) => {
-        if(haystack.arguments.length !== 1) {
-          return false
-        }
-
         const firstArgument = haystack.arguments[0] || {}
         if(firstArgument.type === 'Identifier') {
           return true
@@ -164,6 +203,42 @@ export default function transformer(file, api) {
         }
         // Find usage of `this.props.url`
         const thisPropsUrlUsage = getThisPropsUrlNodes(j, implementation)
+        
+        implementation.find(j.Property, {key: {name: 'url'}}).forEach((propertyRule) => {
+          const isThisPropsDestructure = j(propertyRule).closest(j.VariableDeclarator, {
+            init: {
+              object: {
+                type: 'ThisExpression'
+              },
+              property: {name: 'props'}
+            }
+           }
+          )
+          if(isThisPropsDestructure.length === 0) {
+            return
+          }
+          const originalKeyValue = propertyRule.value.value.name
+          propertyRule.value.key.name = 'router'
+          wrapDefaultExportInWithRouter()
+          addWithRouterImport(j, root)
+          // If the property is reassigned to another variable we don't have to transform it
+          if(originalKeyValue !== 'url') {
+            return
+          }
+          
+          propertyRule.value.value.name = 'router'
+          j(propertyRule).closest(j.BlockStatement).find(j.Identifier, (node) => {
+            if(node.type === 'JSXIdentifier') {
+              return false
+            }
+            
+            if(node.name !== 'url') {
+              return false
+            }
+            
+            return true
+          }).replaceWith(j.identifier('router'))
+        })
 
         if(thisPropsUrlUsage.length === 0) {
           return
@@ -177,14 +252,83 @@ export default function transformer(file, api) {
       })
     }
 
-    const thisPropsUrlUsage = getThisPropsUrlNodes(j, j(rule))
+    j(rule).find(j.Property, {key: {name: 'url'}}).forEach((propertyRule) => {
+      const isThisPropsDestructure = j(propertyRule).closest(j.VariableDeclarator, {
+        init: {
+          object: {
+            type: 'ThisExpression'
+          },
+          property: {name: 'props'}
+        }
+       }
+      )
+      if(isThisPropsDestructure.length === 0) {
+      	return
+      }
+      const originalKeyValue = propertyRule.value.value.name
+      propertyRule.value.key.name = 'router'
+      wrapDefaultExportInWithRouter()
+      addWithRouterImport(j, root)
+      // If the property is reassigned to another variable we don't have to transform it
+      if(originalKeyValue !== 'url') {
+        return
+      }
+      
+      propertyRule.value.value.name = 'router'
+      j(propertyRule).closest(j.BlockStatement).find(j.Identifier, (node) => {
+        if(node.type === 'JSXIdentifier') {
+          return false
+        }
+        
+        if(node.name !== 'url') {
+          return false
+        }
+        
+        return true
+      }).replaceWith(j.identifier('router'))
+    })
+   
+    j(rule).find(j.MethodDefinition, {key: {name: 'componentWillReceiveProps'}}).forEach((methodRule) => {
+      const func = methodRule.value.value
+      if(!func.params[0]) {
+        return
+      }
+      const firstArgumentName = func.params[0].name
+      const propsUrlUsage = getPropsUrlNodes(j, j(methodRule), firstArgumentName)
+      turnUrlIntoRouter(j, propsUrlUsage)
+      if(propsUrlUsage.length === 0) {
+        return
+      }
+      wrapDefaultExportInWithRouter()
+      addWithRouterImport(j, root)
+    })
+    
+    j(rule).find(j.MethodDefinition, {key: {name: 'componentDidUpdate'}}).forEach((methodRule) => {
+      const func = methodRule.value.value
+      if(!func.params[0]) {
+        return
+      }
+      const firstArgumentName = func.params[0].name
+      const propsUrlUsage = getPropsUrlNodes(j, j(methodRule), firstArgumentName)
+      turnUrlIntoRouter(j, propsUrlUsage)
+      if(propsUrlUsage.length === 0) {
+        return
+      }
+      wrapDefaultExportInWithRouter()
+      addWithRouterImport(j, root)
+    })
 
-    if(thisPropsUrlUsage.length === 0) {
-      return
-    }
+    const thisPropsUrlUsage = getThisPropsUrlNodes(j, j(rule))
+    const propsUrlUsage = getPropsUrlNodes(j, j(rule), 'props')
 
     // rename `url` to `router`
     turnUrlIntoRouter(j, thisPropsUrlUsage)
+    turnUrlIntoRouter(j, propsUrlUsage)
+
+    if(thisPropsUrlUsage.length === 0 && propsUrlUsage.length === 0) {
+      return
+    }
+
     wrapDefaultExportInWithRouter()
     addWithRouterImport(j, root)
     return
