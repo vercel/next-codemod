@@ -1,6 +1,6 @@
 # Next.js codemod
 
-codemod transformations for [jscodeshift](https://github.com/facebook/jscodeshift) to help upgrading Next.js codebases
+Codemod transformations to help upgrade Next.js codebases
 
 ## How to use
 
