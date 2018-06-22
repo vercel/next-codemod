@@ -56,7 +56,7 @@ cd path-to-your-project
 Download the codemod:
 
 ```
-curl https://github.com/zeit/next-codemod/archive/master.tar.gz | tar -xz --strip=2 next-codemod-master/transforms/url-to-withrouter.js
+curl -L https://github.com/zeit/next-codemod/archive/master.tar.gz | tar -xz --strip=2 next-codemod-master/transforms/url-to-withrouter.js
 ```
 
 Run the transformation:
