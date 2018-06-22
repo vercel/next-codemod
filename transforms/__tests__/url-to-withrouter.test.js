@@ -21,7 +21,8 @@ const fixtures = [
 	'with-nested-arrow-function',
 	'componentdidupdate',
 	'componentwillreceiveprops',
-	'first-parameter-hoc'
+	'first-parameter-hoc',
+	'url-property-not-part-of-this-props'
 ];
 
 for (const fixture of fixtures) {

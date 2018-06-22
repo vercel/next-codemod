@@ -2,7 +2,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "test": "npm run lint && jest",
+    "test": "npm run lint && npm run testonly",
+    "testonly": "jest",
     "lint": "zeit-eslint --ext .jsx,.js .",
     "lint-staged": "git diff --diff-filter=ACMRT --cached --name-only '*.js' '*.jsx' | xargs zeit-eslint"
   },

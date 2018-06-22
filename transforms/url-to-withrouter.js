@@ -165,24 +165,31 @@ export default function transformer(file, api) {
 
 		const arrowFunctions = j(rule).find(j.ArrowFunctionExpression);
 		(() => {
-			if (arrowFunctions.length > 0) {
-				arrowFunctions.forEach((r) => {
-					if (!r.value.params || !r.value.params[0]) {
-						return;
-					}
-
-					const name = r.value.params[0].name;
-					const propsUrlUsage = getPropsUrlNodes(j, j(r), name);
-					if (propsUrlUsage.length === 0) {
-						return;
-					}
-
-					turnUrlIntoRouter(j, propsUrlUsage);
-					wrapDefaultExportInWithRouter();
-					addWithRouterImport(j, root);
-				});
+			if (arrowFunctions.length === 0) {
 				return;
 			}
+
+			arrowFunctions.forEach((r) => {
+				// This makes sure we don't match nested functions, only the top one
+				if (j(r).closest(j.Expression).length !== 0) {
+					return;
+				}
+
+				if (!r.value.params || !r.value.params[0]) {
+					return;
+				}
+
+				const name = r.value.params[0].name;
+				const propsUrlUsage = getPropsUrlNodes(j, j(r), name);
+				if (propsUrlUsage.length === 0) {
+					return;
+				}
+
+				turnUrlIntoRouter(j, propsUrlUsage);
+				wrapDefaultExportInWithRouter();
+				addWithRouterImport(j, root);
+			});
+			return;
 		})();
 
 		if (declaration.type === 'CallExpression') {
