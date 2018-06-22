@@ -1,0 +1,3 @@
+# These files shouldn't be touched, otherwise tests might have unexpected results.
+**/*.input.js
+**/*.output.js
