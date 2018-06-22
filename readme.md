@@ -43,7 +43,7 @@ export default withRouter(class extends React.Component {
 })
 ```
 
-This is just one case. All the cases that are transformed (and tested) can be found in the `transforms/__testfixtures__/url-to-withrouter` directory.
+This is just one case. All the cases that are transformed (and tested) can be found in the [`__testfixtures__` directory](./transforms/__testfixtures__/url-to-withrouter).
 
 #### Usage
 
