@@ -20,7 +20,7 @@ Tranforms the deprecated automatically injected `url` property on top level page
 
 For example:
 
-```
+```js
 // From
 import React from 'react'
 export default class extends React.Component {
@@ -31,7 +31,7 @@ export default class extends React.Component {
 }
 ```
 
-```
+```js
 // To
 import React from 'react'
 import {withRouter} from 'next/router'
