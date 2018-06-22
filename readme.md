@@ -66,3 +66,7 @@ jscodeshift -t ./url-to-withrouter.js pages/**/*.js
 ```
 
 After the transformation is done the `url-to-withrouter.js` file in the root of your project can be removed.
+
+## Authors
+
+- Tim Neutkens ([@timneutkens](https://twitter.com/timneutkens)) – [ZEIT](https://zeit.co)
