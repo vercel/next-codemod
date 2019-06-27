@@ -8,13 +8,13 @@
     "lint-staged": "git diff --diff-filter=ACMRT --cached --name-only '*.js' '*.jsx' | xargs zeit-eslint"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.4.5",
     "@zeit/eslint-config-node": "^0.3.0",
     "@zeit/git-hooks": "^0.1.4",
     "babel-eslint": "^8.2.3",
-    "babel-preset-env": "^1.7.0",
     "eslint": "^4.19.1",
-    "jest": "^23.1.0",
-    "jscodeshift": "^0.5.1"
+    "jest": "^24.8.0",
+    "jscodeshift": "^0.6.4"
   },
   "eslintConfig": {
     "parser": "babel-eslint",
