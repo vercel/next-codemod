@@ -25,7 +25,7 @@ For example:
 import React from 'react'
 export default class extends React.Component {
   render() {
-    const {pathname} = this.props.url
+    const { pathname } = this.props.url
     return <div>Current pathname: {pathname}</div>
   }
 }
@@ -34,13 +34,15 @@ export default class extends React.Component {
 ```js
 // To
 import React from 'react'
-import {withRouter} from 'next/router'
-export default withRouter(class extends React.Component {
-  render() {
-    const {pathname} = this.props.router
-    return <div>Current pathname: {pathname}</div>
+import { withRouter } from 'next/router'
+export default withRouter(
+  class extends React.Component {
+    render() {
+      const { pathname } = this.props.router
+      return <div>Current pathname: {pathname}</div>
+    }
   }
-})
+)
 ```
 
 This is just one case. All the cases that are transformed (and tested) can be found in the [`__testfixtures__` directory](./transforms/__testfixtures__/url-to-withrouter).
