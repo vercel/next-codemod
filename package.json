@@ -11,8 +11,8 @@
     "@babel/preset-env": "^7.4.5",
     "@zeit/eslint-config-node": "^0.3.0",
     "@zeit/git-hooks": "^0.1.4",
-    "babel-eslint": "^8.2.3",
-    "eslint": "^4.19.1",
+    "babel-eslint": "^10.0.2",
+    "eslint": "^6.0.1",
     "jest": "^24.8.0",
     "jscodeshift": "^0.6.4"
   },
