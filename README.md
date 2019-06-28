@@ -2,7 +2,59 @@
 
 This repository contains Codemod transformations to help upgrade Next.js codebases.
 
-## Transforms
+## Next.js 9 Transforms
+
+### `withamp-to-config`
+
+Transforms the `withAmp` HOC into Next.js 9 page configuration.
+
+For example:
+
+```js
+// Before
+import { withAmp } from 'next/amp'
+
+function Home() {
+  return <h1>My AMP Page</h1>
+}
+
+export default withAmp(Home)
+```
+
+```js
+// After
+export default function Home() {
+  return <h1>My AMP Page</h1>
+}
+
+export const config = {
+  amp: true,
+}
+```
+
+#### Usage
+
+Go to your project
+
+```
+cd path-to-your-project/
+```
+
+Download the codemod:
+
+```
+curl -L https://github.com/zeit/next-codemod/archive/master.tar.gz | tar -xz --strip=2 next-codemod-master/transforms/withamp-to-config.js
+```
+
+Run the transformation:
+
+```
+npx jscodeshift -t ./withamp-to-config.js pages/**/*.js
+```
+
+After the transformation is done the `withamp-to-config.js` file in the root of your project can be removed.
+
+## Next.js 6 Transforms
 
 ### `url-to-withrouter`
 
