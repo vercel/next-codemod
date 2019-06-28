@@ -16,8 +16,8 @@ const fixtures = [
 for (const fixture of fixtures) {
 	defineTest(
 		__dirname,
-		'with-amp-removal',
+		'withamp-to-config',
 		null,
-		`with-amp-removal/${fixture}`
+		`withamp-to-config/${fixture}`
 	);
 }
