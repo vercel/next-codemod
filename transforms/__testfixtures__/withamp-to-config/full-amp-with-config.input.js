@@ -1,4 +1,4 @@
-import { withAmp } from 'next/amp'
+import { withAmp, useAmp } from 'next/amp'
 
 function Home() {
   const config = {}

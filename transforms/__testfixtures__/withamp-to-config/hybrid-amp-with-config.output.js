@@ -1,5 +1,3 @@
-import { useAmp } from 'next/amp';
-
 function Home() {
   const config = {}
   return <h1>My AMP Page</h1>
@@ -7,7 +5,7 @@ function Home() {
 
 export const config = {
   foo: 'bar',
-  amp: true
+  amp: "hybrid"
 }
 
 export default Home;

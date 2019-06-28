@@ -1,4 +1,4 @@
-function injectAmp(j, o) {
+function injectAmp(j, o, desiredAmpValue) {
 	const init = o.node.init;
 
 	switch (init.type) {
@@ -11,7 +11,7 @@ function injectAmp(j, o) {
 					return false;
 				}
 
-				prop.value = j.booleanLiteral(true);
+				prop.value = desiredAmpValue;
 				return true;
 			default:
 				return false;
@@ -20,7 +20,7 @@ function injectAmp(j, o) {
 
 		if (!overwroteAmpKey) {
 			init.properties.push(
-				j.objectProperty(j.identifier('amp'), j.booleanLiteral(true))
+				j.objectProperty(j.identifier('amp'), desiredAmpValue)
 			);
 		}
 
@@ -79,6 +79,8 @@ export default function transformer(file, api) {
 		return done();
 	}
 
+	let desiredAmpValue = j.booleanLiteral(true);
+
 	const defaultExport = defaultExportsShift.nodes()[0];
 	const removedWrapper = ampImportNames.some((ampImportName) => {
 		const ampWrapping = j(defaultExport).find(j.CallExpression, {
@@ -90,7 +92,34 @@ export default function transformer(file, api) {
 		}
 
 		ampWrapping.forEach((e) => {
-			j(e).replaceWith(e.value.arguments);
+			if (e.value.arguments.length < 1) {
+				j(e).remove();
+			} else {
+				const withAmpOptions = e.value.arguments[1];
+				if (withAmpOptions && withAmpOptions.type === 'ObjectExpression') {
+					const isHybrid = withAmpOptions.properties.some((prop) => {
+						if (!(prop.type === 'Property' || prop.type === 'ObjectProperty')) {
+							return false;
+						}
+
+						if (!(prop.key && prop.key.name === 'hybrid')) {
+							return false;
+						}
+
+						return (
+							(prop.value.type === 'Literal' ||
+                prop.value.type === 'BooleanLiteral') &&
+              prop.value.value === true
+						);
+					});
+
+					if (isHybrid) {
+						desiredAmpValue = j.stringLiteral('hybrid');
+					}
+				}
+
+				j(e).replaceWith(e.value.arguments[0]);
+			}
 		});
 		return true;
 	});
@@ -106,7 +135,7 @@ export default function transformer(file, api) {
 		});
 		if (configExportedObject.length > 0) {
 			return configExportedObject.some((exportedObject) =>
-				injectAmp(j, exportedObject));
+				injectAmp(j, exportedObject, desiredAmpValue));
 		}
 
 		const configReexported = j(namedExport).find(j.ExportSpecifier, {
@@ -116,7 +145,8 @@ export default function transformer(file, api) {
 			const configObjects = root
 				.findVariableDeclarators('config')
 				.filter((el) => el.scope.isGlobal);
-			return configObjects.some((configObject) => injectAmp(j, configObject));
+			return configObjects.some((configObject) =>
+				injectAmp(j, configObject, desiredAmpValue));
 		}
 
 		return false;
@@ -129,7 +159,7 @@ export default function transformer(file, api) {
 					j.variableDeclarator(
 						j.identifier('config'),
 						j.objectExpression([
-							j.objectProperty(j.identifier('amp'), j.booleanLiteral(true))
+							j.objectProperty(j.identifier('amp'), desiredAmpValue)
 						])
 					)
 				])

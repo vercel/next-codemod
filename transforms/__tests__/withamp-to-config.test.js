@@ -10,7 +10,9 @@ const fixtures = [
 	'full-amp-inline',
 	'full-amp-with-config',
 	'full-amp-with-config-dupe',
-	'full-amp-with-config-var'
+	'full-amp-with-config-var',
+	'hybrid-amp',
+	'hybrid-amp-with-config'
 ];
 
 for (const fixture of fixtures) {
