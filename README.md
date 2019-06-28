@@ -2,7 +2,7 @@
 
 This repository contains Codemod transformations to help upgrade Next.js codebases.
 
-## Next.js 9 Transforms
+## v9
 
 ### `withamp-to-config`
 
@@ -54,7 +54,7 @@ npx jscodeshift -t ./withamp-to-config.js pages/**/*.js
 
 After the transformation is done the `withamp-to-config.js` file in the root of your project can be removed.
 
-## Next.js 6 Transforms
+## v6
 
 ### `url-to-withrouter`
 
