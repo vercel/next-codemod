@@ -1,3 +1,5 @@
+// One-time usage file. You can delete me after running the codemod!
+
 function injectAmp(j, o, desiredAmpValue) {
 	const init = o.node.init;
 

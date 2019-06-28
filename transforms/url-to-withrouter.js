@@ -1,3 +1,5 @@
+// One-time usage file. You can delete me after running the codemod!
+
 function addWithRouterImport(j, root) {
 	// We create an import specifier, this is the value of an import, eg:
 	// import {withRouter} from 'next/router
