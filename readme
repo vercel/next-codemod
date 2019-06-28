@@ -1,16 +1,6 @@
-# Next.js codemod
+# Next.js Codemod
 
-Codemod transformations to help upgrade Next.js codebases
-
-## How to use
-
-### Setup
-
-Install [jscodeshift](https://github.com/facebook/jscodeshift):
-
-```
-npm install -g jscodeshift
-```
+This repository contains Codemod transformations to help upgrade Next.js codebases.
 
 ## Transforms
 
@@ -52,7 +42,7 @@ This is just one case. All the cases that are transformed (and tested) can be fo
 Go to your project
 
 ```
-cd path-to-your-project
+cd path-to-your-project/
 ```
 
 Download the codemod:
@@ -64,7 +54,7 @@ curl -L https://github.com/zeit/next-codemod/archive/master.tar.gz | tar -xz --s
 Run the transformation:
 
 ```
-jscodeshift -t ./url-to-withrouter.js pages/**/*.js
+npx jscodeshift -t ./url-to-withrouter.js pages/**/*.js
 ```
 
 After the transformation is done the `url-to-withrouter.js` file in the root of your project can be removed.
@@ -72,3 +62,4 @@ After the transformation is done the `url-to-withrouter.js` file in the root of 
 ## Authors
 
 - Tim Neutkens ([@timneutkens](https://twitter.com/timneutkens)) – [ZEIT](https://zeit.co)
+- Joe Haddad ([@timer150](https://twitter.com/timer150)) - [ZEIT](https://zeit.co)
