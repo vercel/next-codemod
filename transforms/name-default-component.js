@@ -26,7 +26,7 @@ export default function transformer(file, api, options) {
 
 	const hasRootAsParent = (path) => {
 		const program = path.parentPath.parentPath.parentPath.parentPath.parentPath;
-		return program && program.value && program.value.type === 'Program';
+		return !program || (program && program.value && program.value.type === 'Program');
 	};
 
 	const nameFunctionComponent = (path) => {

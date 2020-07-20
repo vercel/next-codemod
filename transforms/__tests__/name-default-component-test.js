@@ -10,6 +10,8 @@ const fixtures = [
 	'function-expression',
 	'function-expression-ignore',
 	'existing-name',
+	'existing-name-2',
+	'existing-name-3',
 	'existing-name-ignore',
 	'1-starts-with-number',
 	'special-ch@racter'
