@@ -4,6 +4,60 @@ This repository contains Codemod transformations to help upgrade Next.js codebas
 
 ## v9
 
+### `name-default-component`
+
+Transforms anonymous components into named components to make sure they work with [Fast Refresh](https://nextjs.org/blog/next-9-4#fast-refresh).
+
+For example
+
+```jsx
+// my-component.js
+export default function () {
+  return <div>Hello World</div>;
+}
+```
+
+Transforms into:
+
+```jsx
+// my-component.js
+export default function MyComponent() {
+  return <div>Hello World</div>;
+}
+```
+
+The component will have a camel cased name based on the name of the file, and it also works with arrow functions.
+
+#### Usage
+
+Go to your project
+
+```
+cd path-to-your-project/
+```
+
+Download the codemod:
+
+```
+curl -L https://github.com/zeit/next-codemod/archive/master.tar.gz | tar -xz --strip=2 next-codemod-master/transforms/name-default-component.js
+```
+
+Run the transformation:
+
+```
+npx jscodeshift -t ./name-default-component.js components/**/*.js
+```
+
+TypeScript files can use this codemod too:
+
+```
+npx jscodeshift -t ./name-default-component.js --parser=tsx components/**/*.tsx
+```
+
+If you have components in multiple folders, change the path to `**/*.js` and add `--ignore-pattern="**/node_modules/**"`.
+
+After the transformation is done the `name-default-component.js` file in the root of your project can be removed.
+
 ### `withamp-to-config`
 
 Transforms the `withAmp` HOC into Next.js 9 page configuration.
